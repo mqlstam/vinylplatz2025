@@ -73,6 +73,12 @@ const routes = [
     component: () => import('../views/vinyl/MyVinylListings.vue'),
     beforeEnter: authGuard
   },
+  {
+    path: '/favorites',
+    name: 'favorites',
+    component: () => import('../views/vinyl/MyFavorites.vue'),
+    beforeEnter: authGuard
+  },
   // Admin routes
   {
     path: '/admin',

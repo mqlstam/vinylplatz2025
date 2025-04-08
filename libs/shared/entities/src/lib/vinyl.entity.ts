@@ -1,7 +1,8 @@
 import { 
   Column, 
   Entity, 
-  ManyToOne, 
+  ManyToOne,
+  ManyToMany, 
   JoinColumn, 
   PrimaryGeneratedColumn 
 } from 'typeorm';
@@ -97,4 +98,7 @@ export class Vinyl {
 
   @Column({ nullable: true })
   genreId?: string;
+
+  @ManyToMany(() => User, user => user.favorites)
+  favoritedBy: User[];
 }

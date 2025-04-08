@@ -42,6 +42,20 @@ export class User {
   @OneToMany(() => Vinyl, vinyl => vinyl.seller)
   vinyls: Vinyl[];
 
+  @ManyToMany(() => Vinyl)
+  @JoinTable({
+    name: 'user_favorites',
+    joinColumn: {
+      name: 'userId',
+      referencedColumnName: 'id'
+    },
+    inverseJoinColumn: {
+      name: 'vinylId',
+      referencedColumnName: 'id'
+    }
+  })
+  favorites: Vinyl[];
+
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword() {

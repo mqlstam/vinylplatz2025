@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '../../stores/auth';
 import { vinylService, Vinyl } from '../../services/vinyl.service';
+import { favoritesService } from '../../services/favorites.service';
 
 const route = useRoute();
 const router = useRouter();
@@ -14,6 +15,10 @@ const loading = ref(true);
 const error = ref<string | null>(null);
 const showConfirmDelete = ref(false);
 const deleting = ref(false);
+
+// Favorite state
+const isFavorited = ref(false);
+const favoritesLoading = ref(false);
 
 // Computed properties
 const isAuthenticated = computed(() => auth.isAuthenticated);
@@ -34,11 +39,46 @@ const loadVinyl = async () => {
   
   try {
     vinyl.value = await vinylService.getById(vinylId.value);
+    
+    // Check favorite status if user is authenticated
+    if (isAuthenticated.value) {
+      checkFavoriteStatus();
+    }
   } catch (err) {
     console.error('Error loading vinyl details:', err);
     error.value = 'Failed to load vinyl details. Please try again later.';
   } finally {
     loading.value = false;
+  }
+};
+
+// Check if vinyl is in user's favorites
+const checkFavoriteStatus = async () => {
+  if (!isAuthenticated.value || !vinyl.value) return;
+  
+  try {
+    isFavorited.value = await favoritesService.checkFavoriteStatus(vinyl.value.id);
+  } catch (err) {
+    console.error('Error checking favorite status:', err);
+  }
+};
+
+// Toggle favorite status
+const toggleFavorite = async () => {
+  if (!isAuthenticated.value || !vinyl.value) {
+    router.push('/login');
+    return;
+  }
+  
+  favoritesLoading.value = true;
+  
+  try {
+    const response = await favoritesService.toggleFavorite(vinyl.value.id, isFavorited.value);
+    isFavorited.value = response.isFavorited;
+  } catch (err) {
+    console.error('Error toggling favorite:', err);
+  } finally {
+    favoritesLoading.value = false;
   }
 };
 
@@ -168,27 +208,68 @@ onMounted(() => {
               Back to Listings
             </button>
             
-            <div v-if="isOwner" class="flex space-x-3">
+            <div class="flex space-x-3">
+              <!-- Favorite button (only for authenticated users who are not the seller) -->
               <button
-                @click="editVinyl"
-                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                v-if="isAuthenticated && !isOwner"
+                @click="toggleFavorite"
+                :disabled="favoritesLoading"
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                :class="isFavorited ? 'bg-pink-600 hover:bg-pink-700' : 'bg-gray-600 hover:bg-gray-700'"
               >
-                Edit Listing
+                <svg 
+                  class="h-5 w-5 mr-1" 
+                  fill="currentColor" 
+                  viewBox="0 0 20 20" 
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path 
+                    v-if="isFavorited"
+                    fill-rule="evenodd" 
+                    d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" 
+                    clip-rule="evenodd"
+                  />
+                  <path 
+                    v-else
+                    fill-rule="evenodd" 
+                    d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" 
+                    clip-rule="evenodd"
+                    stroke="currentColor"
+                    stroke-width="1"
+                    fill="none"
+                  />
+                </svg>
+                {{ isFavorited ? 'Favorited' : 'Add to Favorites' }}
               </button>
-              <button
-                @click="showConfirmDelete = true"
-                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              
+              <!-- Edit/Delete buttons (only for owner) -->
+              <div v-if="isOwner" class="flex space-x-3">
+                <button
+                  @click="editVinyl"
+                  class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  Edit Listing
+                </button>
+                <button
+                  @click="showConfirmDelete = true"
+                  class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                >
+                  Delete Listing
+                </button>
+              </div>
+              
+              <!-- Login to favorite (for unauthenticated users) -->
+              <router-link
+                v-if="!isAuthenticated"
+                to="/login"
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
-                Delete Listing
-              </button>
+                <svg class="h-5 w-5 mr-1" fill="none" viewBox="0 0 20 20" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" />
+                </svg>
+                Login to Favorite
+              </router-link>
             </div>
-            
-            <button
-              v-else-if="isAuthenticated && vinyl.seller && vinyl.seller.id !== auth.user?.id"
-              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-            >
-              Contact Seller
-            </button>
           </div>
         </div>
       </div>
