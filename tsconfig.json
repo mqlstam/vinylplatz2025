@@ -23,6 +23,12 @@
     },
     {
       "path": "./libs/vinylplatz-web"
+    },
+    {
+      "path": "./libs/shared"
+    },
+    {
+      "path": "./libs/vinylplatz-web"
     }
   ]
 }
