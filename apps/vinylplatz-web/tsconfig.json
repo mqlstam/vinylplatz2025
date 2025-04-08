@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/vinylplatz-web"
+    },
+    {
       "path": "./tsconfig.app.json"
     },
     {
