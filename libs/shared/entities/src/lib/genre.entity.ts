@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
+import { Vinyl } from './vinyl.entity';
 
 @Entity('genres')
 export class Genre {
@@ -18,4 +19,7 @@ export class Genre {
     required: false 
   })
   description?: string;
+  
+  @OneToMany(() => Vinyl, vinyl => vinyl.genre)
+  vinyls: Vinyl[];
 }

@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { GenreModule } from './modules/genre/genre.module';
+import { VinylModule } from './modules/vinyl/vinyl.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { GenreModule } from './modules/genre/genre.module';
     UserModule,
     AuthModule,
     GenreModule,
+    VinylModule
   ],
   controllers: [AppController],
   providers: [AppService],

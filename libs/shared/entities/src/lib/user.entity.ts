@@ -1,6 +1,7 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, ManyToMany, JoinTable, PrimaryGeneratedColumn } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
+import { Vinyl } from './vinyl.entity';
 
 export enum UserRole {
   USER = 'user',
@@ -37,6 +38,9 @@ export class User {
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   registrationDate: Date;
+
+  @OneToMany(() => Vinyl, vinyl => vinyl.seller)
+  vinyls: Vinyl[];
 
   @BeforeInsert()
   @BeforeUpdate()

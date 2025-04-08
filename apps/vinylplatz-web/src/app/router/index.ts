@@ -44,6 +44,35 @@ const routes = [
     name: 'genres',
     component: () => import('../views/genre/GenreList.vue')
   },
+  // Vinyl routes
+  {
+    path: '/vinyls',
+    name: 'vinyls',
+    component: () => import('../views/vinyl/VinylList.vue')
+  },
+  {
+    path: '/vinyls/new',
+    name: 'new-vinyl',
+    component: () => import('../views/vinyl/VinylForm.vue'),
+    beforeEnter: authGuard
+  },
+  {
+    path: '/vinyls/:id',
+    name: 'vinyl-detail',
+    component: () => import('../views/vinyl/VinylDetail.vue')
+  },
+  {
+    path: '/vinyls/edit/:id',
+    name: 'edit-vinyl',
+    component: () => import('../views/vinyl/VinylForm.vue'),
+    beforeEnter: authGuard
+  },
+  {
+    path: '/my-vinyls',
+    name: 'my-vinyls',
+    component: () => import('../views/vinyl/MyVinylListings.vue'),
+    beforeEnter: authGuard
+  },
   // Admin routes
   {
     path: '/admin',
