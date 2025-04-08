@@ -200,3 +200,20 @@ export class VinylResponseDto {
     name: string;
   };
 }
+
+export class PaginatedVinylsResponseDto {
+  @ApiProperty({ type: [VinylResponseDto], description: 'List of vinyl records' })
+  items: VinylResponseDto[];
+
+  @ApiProperty({ example: 100, description: 'Total number of vinyl records matching the criteria' })
+  total: number;
+
+  @ApiProperty({ example: 1, description: 'Current page number' })
+  page: number;
+
+  @ApiProperty({ example: 12, description: 'Number of items per page' })
+  limit: number;
+
+  @ApiProperty({ example: 9, description: 'Total number of pages' })
+  totalPages: number;
+}

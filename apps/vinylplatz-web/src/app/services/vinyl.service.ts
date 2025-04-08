@@ -45,14 +45,29 @@ export interface UpdateVinylDto {
   genreId?: string;
 }
 
-export interface VinylFilter {
-  sellerId?: string;
-  genreId?: string;
+export interface VinylFilterParams {
   title?: string;
   artist?: string;
+  genreId?: string;
+  sellerId?: string;
   condition?: string;
   minPrice?: number;
   maxPrice?: number;
+  releaseYear?: number;
+  minReleaseYear?: number;
+  maxReleaseYear?: number;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'ASC' | 'DESC';
+}
+
+export interface PaginatedResponse<T> {
+  items: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
 // Create axios instance with base URL
@@ -80,11 +95,22 @@ apiClient.interceptors.request.use(
 // Vinyl service
 export const vinylService = {
   /**
-   * Get all vinyls with optional filtering
+   * Get all vinyls with optional filtering and pagination
    */
-  async getAll(filter?: VinylFilter): Promise<Vinyl[]> {
-    const response = await apiClient.get('/vinyls', { params: filter });
-    return response.data.results || response.data;
+  async getAll(filters?: VinylFilterParams): Promise<PaginatedResponse<Vinyl>> {
+    const response = await apiClient.get('/vinyls', { 
+      params: filters,
+      // Ensure params with undefined/null values are not sent
+      paramsSerializer: (params) => {
+        const validParams = Object.entries(params)
+          .filter(([_, value]) => value !== undefined && value !== null && value !== '')
+          .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+          .join('&');
+        return validParams;
+      }
+    });
+    
+    return response.data;
   },
 
   /**
@@ -96,9 +122,9 @@ export const vinylService = {
   },
 
   /**
-   * Get all vinyls listed by the currently authenticated user
+   * Get vinyls listed by the current user
    */
-  async getMyListings(): Promise<Vinyl[]> {
+  async getMyVinyls(): Promise<Vinyl[]> {
     const response = await apiClient.get('/vinyls/seller/me');
     return response.data.results || response.data;
   },

@@ -11,7 +11,7 @@ import {
   Query,
   ForbiddenException
 } from '@nestjs/common';
-import { VinylService } from './vinyl.service';
+import { VinylService, VinylFilterParams, PaginatedVinyls } from './vinyl.service';
 import { CreateVinylDto, UpdateVinylDto, VinylResponseDto } from './dto/vinyl.dto';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Vinyl, VinylCondition } from '@vinylplatz/entities';
@@ -23,16 +23,23 @@ export class VinylController {
   constructor(private readonly vinylService: VinylService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all vinyls with optional filtering' })
-  @ApiQuery({ name: 'sellerId', required: false, description: 'Filter by seller ID' })
-  @ApiQuery({ name: 'genreId', required: false, description: 'Filter by genre ID' })
+  @ApiOperation({ summary: 'Get all vinyls with optional filtering and pagination' })
   @ApiQuery({ name: 'title', required: false, description: 'Filter by title (partial match)' })
   @ApiQuery({ name: 'artist', required: false, description: 'Filter by artist (partial match)' })
+  @ApiQuery({ name: 'sellerId', required: false, description: 'Filter by seller ID' })
+  @ApiQuery({ name: 'genreId', required: false, description: 'Filter by genre ID' })
   @ApiQuery({ name: 'condition', required: false, enum: VinylCondition, description: 'Filter by condition' })
   @ApiQuery({ name: 'minPrice', required: false, type: Number, description: 'Filter by minimum price' })
   @ApiQuery({ name: 'maxPrice', required: false, type: Number, description: 'Filter by maximum price' })
+  @ApiQuery({ name: 'releaseYear', required: false, type: Number, description: 'Filter by specific release year' })
+  @ApiQuery({ name: 'minReleaseYear', required: false, type: Number, description: 'Filter by minimum release year' })
+  @ApiQuery({ name: 'maxReleaseYear', required: false, type: Number, description: 'Filter by maximum release year' })
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number for pagination' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Number of items per page' })
+  @ApiQuery({ name: 'sortBy', required: false, description: 'Property to sort by (title, artist, price, condition, releaseYear, createdAt)' })
+  @ApiQuery({ name: 'sortOrder', required: false, enum: ['ASC', 'DESC'], description: 'Sort order (ASC or DESC)' })
   @ApiResponse({ status: 200, description: 'Return all vinyls matching the filters', type: [VinylResponseDto] })
-  async findAll(@Query() query: any): Promise<Vinyl[]> {
+  async findAll(@Query() query: VinylFilterParams): Promise<PaginatedVinyls> {
     return this.vinylService.findAll(query);
   }
 
