@@ -2,5 +2,18 @@
   "extends": "./tsconfig.base.json",
   "compileOnSave": false,
   "files": [],
-  "references": []
+  "references": [
+    {
+      "path": "./apps/vinylplatz-web-e2e"
+    },
+    {
+      "path": "./apps/vinylplatz-web"
+    },
+    {
+      "path": "./apps/data-api-e2e"
+    },
+    {
+      "path": "./apps/data-api"
+    }
+  ]
 }
