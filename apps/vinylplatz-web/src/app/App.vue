@@ -30,6 +30,7 @@ const handleLogout = () => {
             </div>
             <nav class="hidden sm:ml-6 sm:flex sm:space-x-8">
               <router-link to="/" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700">Home</router-link>
+              <router-link to="/genres" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700">Genres</router-link>
               <router-link to="/about" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700">About</router-link>
             </nav>
           </div>
@@ -77,6 +78,7 @@ const handleLogout = () => {
       <div v-show="mobileMenuOpen" id="mobile-menu" class="sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
           <router-link to="/" @click="closeMobileMenu" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800">Home</router-link>
+          <router-link to="/genres" @click="closeMobileMenu" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800">Genres</router-link>
           <router-link to="/about" @click="closeMobileMenu" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800">About</router-link>
         </div>
         <div class="pt-4 pb-3 border-t border-gray-200">

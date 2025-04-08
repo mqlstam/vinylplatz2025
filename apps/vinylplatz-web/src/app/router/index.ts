@@ -38,6 +38,12 @@ const routes = [
     component: () => import('../views/profile/UserProfileSettings.vue'),
     beforeEnter: authGuard
   },
+  // Genre routes
+  {
+    path: '/genres',
+    name: 'genres',
+    component: () => import('../views/genre/GenreList.vue')
+  },
   // Admin routes
   {
     path: '/admin',
