@@ -1,8 +1,83 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { authService } from '@vinylplatz/web-auth';
-import type { User, LoginCredentials, RegisterData } from '@vinylplatz/web-auth';
 import { useRouter } from 'vue-router';
+import axios from 'axios';
+import { userService, ProfileUpdateData } from '../services/user.service';
+
+// Define types locally since import from library is causing issues
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: 'user' | 'admin';
+  profileImage?: string;
+  address?: string;
+  registrationDate: string;
+}
+
+interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+interface RegisterData {
+  name: string;
+  email: string;
+  password: string;
+  address?: string;
+  profileImage?: string;
+}
+
+interface AuthResponse {
+  access_token: string;
+  user: User;
+}
+
+// Create a local auth service
+const API_URL = '/api/auth';
+
+// Set up axios instance
+const authApi = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Request interceptor for API calls
+authApi.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+const authService = {
+  async login(credentials: LoginCredentials): Promise<AuthResponse> {
+    const response = await authApi.post<AuthResponse>('/login', credentials);
+    return response.data;
+  },
+
+  async register(userData: RegisterData): Promise<AuthResponse> {
+    const response = await authApi.post<AuthResponse>('/register', userData);
+    return response.data;
+  },
+
+  async getProfile(): Promise<User> {
+    const response = await authApi.get<User>('/profile');
+    return response.data;
+  },
+
+  logout(): void {
+    localStorage.removeItem('token');
+  }
+};
 
 export const useAuthStore = defineStore('auth', () => {
   const router = useRouter();
@@ -10,6 +85,7 @@ export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(null);
   const loading = ref<boolean>(false);
   const error = ref<string | null>(null);
+  const updateSuccess = ref<boolean>(false);
   
   // Initialize from localStorage if available
   if (typeof window !== 'undefined') {
@@ -79,6 +155,27 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
   
+  async function updateProfile(profileData: ProfileUpdateData) {
+    loading.value = true;
+    error.value = null;
+    updateSuccess.value = false;
+    
+    try {
+      const updatedUser = await userService.updateProfile(profileData);
+      // Update the user in the store
+      if (user.value) {
+        user.value = { ...user.value, ...updatedUser };
+      }
+      updateSuccess.value = true;
+      return true;
+    } catch (err: any) {
+      handleError(err);
+      return false;
+    } finally {
+      loading.value = false;
+    }
+  }
+  
   function setUserAndToken(newUser: User, newToken: string) {
     user.value = newUser;
     token.value = newToken;
@@ -93,6 +190,11 @@ export const useAuthStore = defineStore('auth', () => {
     
     // Redirect to login page
     router.push('/login');
+  }
+  
+  function clearUpdateStatus() {
+    updateSuccess.value = false;
+    error.value = null;
   }
   
   function handleError(err: any) {
@@ -111,11 +213,14 @@ export const useAuthStore = defineStore('auth', () => {
     token,
     loading,
     error,
+    updateSuccess,
     isAuthenticated,
     isAdmin,
     login,
     register,
     logout,
-    fetchUserProfile
+    fetchUserProfile,
+    updateProfile,
+    clearUpdateStatus
   };
 });

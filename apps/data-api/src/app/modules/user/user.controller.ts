@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, NotFoundException, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, NotFoundException, Request, ForbiddenException } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto, UpdateUserDto, UserResponseDto } from './dto/user.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from '@vinylplatz/entities';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('users')
 @Controller('users')
@@ -30,6 +32,17 @@ export class UserController {
   @ApiResponse({ status: 404, description: 'User not found' })
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto): Promise<User> {
     return this.userService.update(id, updateUserDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('me/profile')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update current user profile' })
+  @ApiResponse({ status: 200, description: 'Profile has been updated', type: UserResponseDto })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async updateProfile(@Request() req, @Body() updateProfileDto: UpdateProfileDto): Promise<User> {
+    // req.user is set by the JwtAuthGuard (contains the decoded JWT payload)
+    return this.userService.updateProfile(req.user.id, updateProfileDto);
   }
 
   @Delete(':id')

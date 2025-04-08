@@ -32,6 +32,12 @@ const routes = [
     component: () => import('../views/ProfileView.vue'),
     beforeEnter: authGuard
   },
+  {
+    path: '/profile/settings',
+    name: 'profile-settings',
+    component: () => import('../views/profile/UserProfileSettings.vue'),
+    beforeEnter: authGuard
+  },
   // Admin routes
   {
     path: '/admin',
