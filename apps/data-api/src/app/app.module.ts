@@ -8,6 +8,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { GenreModule } from './modules/genre/genre.module';
 import { VinylModule } from './modules/vinyl/vinyl.module';
 import { FavoritesModule } from './modules/favorites/favorites.module';
+import { OrdersModule } from './modules/orders/orders.module';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { FavoritesModule } from './modules/favorites/favorites.module';
     AuthModule,
     GenreModule,
     VinylModule,
-    FavoritesModule
+    FavoritesModule,
+    OrdersModule
   ],
   controllers: [AppController],
   providers: [AppService],

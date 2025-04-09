@@ -3,12 +3,14 @@ import {
   Entity, 
   ManyToOne,
   ManyToMany, 
+  OneToMany,
   JoinColumn, 
   PrimaryGeneratedColumn 
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from './user.entity';
 import { Genre } from './genre.entity';
+import { Order } from './order.entity';
 
 export enum VinylCondition {
   MINT = 'Mint',
@@ -98,6 +100,9 @@ export class Vinyl {
 
   @Column({ nullable: true })
   genreId?: string;
+
+  @OneToMany(() => Order, order => order.vinyl)
+  orders: Order[];
 
   @ManyToMany(() => User, user => user.favorites)
   favoritedBy: User[];

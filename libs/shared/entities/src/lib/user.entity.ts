@@ -2,6 +2,7 @@ import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, ManyToMany, Join
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
 import { Vinyl } from './vinyl.entity';
+import { Order } from './order.entity';
 
 export enum UserRole {
   USER = 'user',
@@ -41,6 +42,12 @@ export class User {
 
   @OneToMany(() => Vinyl, vinyl => vinyl.seller)
   vinyls: Vinyl[];
+
+  @OneToMany(() => Order, order => order.buyer)
+  purchases: Order[];
+
+  @OneToMany(() => Order, order => order.seller)
+  sales: Order[];
 
   @ManyToMany(() => Vinyl)
   @JoinTable({
