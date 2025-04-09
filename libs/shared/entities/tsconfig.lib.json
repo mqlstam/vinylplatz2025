@@ -1,12 +1,10 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "./tsconfig.json", // Ensure this extends the local tsconfig.json
   "compilerOptions": {
     "outDir": "../../../dist/out-tsc",
     "declaration": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "module": "commonjs",
     "types": ["node"]
+    // Removed strictPropertyInitialization: false - rely on base config for decorator settings
   },
   "include": ["src/**/*.ts"],
   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]

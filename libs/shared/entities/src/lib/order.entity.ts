@@ -7,8 +7,8 @@ import {
   CreateDateColumn 
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from './user.entity';
-import { Vinyl } from './vinyl.entity';
+import { User } from './user.entity'; // Ensure this path is correct relative to order.entity.ts
+import { Vinyl } from './vinyl.entity'; // Ensure this path is correct relative to order.entity.ts
 
 export enum OrderStatus {
   PENDING = 'pending',
@@ -22,14 +22,14 @@ export enum OrderStatus {
 export class Order {
   @PrimaryGeneratedColumn('uuid')
   @ApiProperty({ description: 'The unique identifier of the order' })
-  id: string;
+  id!: string; // Added definite assignment assertion
 
   @Column('decimal', { precision: 10, scale: 2 })
   @ApiProperty({ 
     example: 29.99, 
     description: 'The price of the vinyl at the time of order' 
   })
-  price: number;
+  price!: number; // Added definite assignment assertion
 
   @Column({
     type: 'enum',
@@ -41,41 +41,44 @@ export class Order {
     example: OrderStatus.PENDING,
     description: 'The status of the order'
   })
-  status: OrderStatus;
+  status!: OrderStatus; // Added definite assignment assertion
 
   @CreateDateColumn()
   @ApiProperty({ 
     description: 'The date when the order was created' 
   })
-  orderDate: Date;
+  orderDate!: Date; // Added definite assignment assertion
 
-  @ManyToOne(() => User, user => user.purchases)
+  // Added explicit type (user: User)
+  @ManyToOne(() => User, (user: User) => user.purchases)
   @JoinColumn({ name: 'buyerId' })
   @ApiProperty({ 
     description: 'The user who bought this vinyl'
   })
-  buyer: User;
+  buyer!: User; // Added definite assignment assertion
 
   @Column()
-  buyerId: string;
+  buyerId!: string; // Added definite assignment assertion
 
-  @ManyToOne(() => User, user => user.sales)
+  // Added explicit type (user: User)
+  @ManyToOne(() => User, (user: User) => user.sales)
   @JoinColumn({ name: 'sellerId' })
   @ApiProperty({ 
     description: 'The user who sold this vinyl'
   })
-  seller: User;
+  seller!: User; // Added definite assignment assertion
 
   @Column()
-  sellerId: string;
+  sellerId!: string; // Added definite assignment assertion
 
-  @ManyToOne(() => Vinyl, vinyl => vinyl.orders)
+  // Added explicit type (vinyl: Vinyl)
+  @ManyToOne(() => Vinyl, (vinyl: Vinyl) => vinyl.orders)
   @JoinColumn({ name: 'vinylId' })
   @ApiProperty({ 
     description: 'The vinyl being ordered'
   })
-  vinyl: Vinyl;
+  vinyl!: Vinyl; // Added definite assignment assertion
 
   @Column()
-  vinylId: string;
+  vinylId!: string; // Added definite assignment assertion
 }

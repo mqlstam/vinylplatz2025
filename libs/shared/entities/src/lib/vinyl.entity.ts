@@ -5,12 +5,14 @@ import {
   ManyToMany, 
   OneToMany,
   JoinColumn, 
-  PrimaryGeneratedColumn 
+  PrimaryGeneratedColumn,
+  CreateDateColumn, // Added for potential sorting/filtering
+  UpdateDateColumn // Added for potential sorting/filtering
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from './user.entity';
-import { Genre } from './genre.entity';
-import { Order } from './order.entity';
+import { User } from './user.entity'; // Ensure this path is correct relative to vinyl.entity.ts
+import { Genre } from './genre.entity'; // Ensure this path is correct relative to vinyl.entity.ts
+import { Order } from './order.entity'; // Ensure this path is correct relative to vinyl.entity.ts
 
 export enum VinylCondition {
   MINT = 'Mint',
@@ -27,15 +29,15 @@ export enum VinylCondition {
 export class Vinyl {
   @PrimaryGeneratedColumn('uuid')
   @ApiProperty({ description: 'The unique identifier of the vinyl' })
-  id: string;
+  id!: string; // Added definite assignment assertion
 
   @Column()
   @ApiProperty({ example: 'Thriller', description: 'The title of the vinyl album' })
-  title: string;
+  title!: string; // Added definite assignment assertion
 
   @Column()
   @ApiProperty({ example: 'Michael Jackson', description: 'The artist of the vinyl album' })
-  artist: string;
+  artist!: string; // Added definite assignment assertion
 
   @Column({ nullable: true })
   @ApiProperty({ 
@@ -55,14 +57,14 @@ export class Vinyl {
     example: VinylCondition.VERY_GOOD,
     description: 'The condition of the vinyl'
   })
-  condition: VinylCondition;
+  condition!: VinylCondition; // Added definite assignment assertion
 
   @Column('decimal', { precision: 10, scale: 2 })
   @ApiProperty({ 
     example: 29.99, 
     description: 'The price of the vinyl' 
   })
-  price: number;
+  price!: number; // Added definite assignment assertion
 
   @Column({ nullable: true, type: 'text' })
   @ApiProperty({ 
@@ -80,17 +82,19 @@ export class Vinyl {
   })
   coverImageUrl?: string;
 
-  @ManyToOne(() => User, user => user.vinyls)
+  // Added explicit type (user: User)
+  @ManyToOne(() => User, (user: User) => user.vinyls)
   @JoinColumn({ name: 'sellerId' })
   @ApiProperty({ 
     description: 'The user who is selling this vinyl'
   })
-  seller: User;
+  seller!: User; // Added definite assignment assertion
 
   @Column()
-  sellerId: string;
+  sellerId!: string; // Added definite assignment assertion
 
-  @ManyToOne(() => Genre, genre => genre.vinyls, { nullable: true })
+  // Added explicit type (genre: Genre)
+  @ManyToOne(() => Genre, (genre: Genre) => genre.vinyls, { nullable: true })
   @JoinColumn({ name: 'genreId' })
   @ApiProperty({ 
     description: 'The genre of the vinyl',
@@ -101,9 +105,17 @@ export class Vinyl {
   @Column({ nullable: true })
   genreId?: string;
 
-  @OneToMany(() => Order, order => order.vinyl)
-  orders: Order[];
+  // Added explicit type (order: Order)
+  @OneToMany(() => Order, (order: Order) => order.vinyl)
+  orders!: Order[]; // Added definite assignment assertion
 
-  @ManyToMany(() => User, user => user.favorites)
-  favoritedBy: User[];
+  // Added explicit type (user: User)
+  @ManyToMany(() => User, (user: User) => user.favorites)
+  favoritedBy!: User[]; // Added definite assignment assertion
+
+  @CreateDateColumn()
+  createdAt!: Date; // Added definite assignment assertion
+
+  @UpdateDateColumn()
+  updatedAt!: Date; // Added definite assignment assertion
 }

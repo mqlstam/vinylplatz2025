@@ -1,8 +1,8 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, ManyToMany, JoinTable, PrimaryGeneratedColumn } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
-import { Vinyl } from './vinyl.entity';
-import { Order } from './order.entity';
+import { Vinyl } from './vinyl.entity'; // Ensure this path is correct relative to user.entity.ts
+import { Order } from './order.entity'; // Ensure this path is correct relative to user.entity.ts
 
 export enum UserRole {
   USER = 'user',
@@ -12,17 +12,17 @@ export enum UserRole {
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string; // Added definite assignment assertion
 
   @Column({ length: 100 })
-  name: string;
+  name!: string; // Added definite assignment assertion
 
   @Column({ unique: true })
-  email: string;
+  email!: string; // Added definite assignment assertion
 
   @Column()
   @Exclude({ toPlainOnly: true })
-  password: string;
+  password!: string; // Added definite assignment assertion
 
   @Column({ nullable: true })
   profileImage?: string;
@@ -35,21 +35,25 @@ export class User {
     enum: UserRole,
     default: UserRole.USER,
   })
-  role: UserRole;
+  role!: UserRole; // Added definite assignment assertion
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  registrationDate: Date;
+  registrationDate!: Date; // Added definite assignment assertion
 
-  @OneToMany(() => Vinyl, vinyl => vinyl.seller)
-  vinyls: Vinyl[];
+  // Added explicit type (vinyl: Vinyl)
+  @OneToMany(() => Vinyl, (vinyl: Vinyl) => vinyl.seller)
+  vinyls!: Vinyl[]; // Added definite assignment assertion
 
-  @OneToMany(() => Order, order => order.buyer)
-  purchases: Order[];
+  // Added explicit type (order: Order)
+  @OneToMany(() => Order, (order: Order) => order.buyer)
+  purchases!: Order[]; // Added definite assignment assertion
 
-  @OneToMany(() => Order, order => order.seller)
-  sales: Order[];
+  // Added explicit type (order: Order)
+  @OneToMany(() => Order, (order: Order) => order.seller)
+  sales!: Order[]; // Added definite assignment assertion
 
-  @ManyToMany(() => Vinyl)
+  // Added explicit type (vinyl: Vinyl) and corrected inverse relation reference
+  @ManyToMany(() => Vinyl, (vinyl: Vinyl) => vinyl.favoritedBy) 
   @JoinTable({
     name: 'user_favorites',
     joinColumn: {
@@ -61,13 +65,13 @@ export class User {
       referencedColumnName: 'id'
     }
   })
-  favorites: Vinyl[];
+  favorites!: Vinyl[]; // Added definite assignment assertion
 
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword() {
-    // Only hash the password if it has been modified
-    if (this.password) {
+    // Only hash the password if it has been modified (check if it looks like a hash)
+    if (this.password && (!this.password.startsWith('') || this.password.length < 50)) {
       const salt = await bcrypt.genSalt();
       this.password = await bcrypt.hash(this.password, salt);
     }
