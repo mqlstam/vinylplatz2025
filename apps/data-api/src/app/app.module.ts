@@ -15,7 +15,8 @@ import { SeedModule } from './modules/seed/seed.module'; // Import SeedModule
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: './apps/data-api/.env',
+      // Point to the correct .env file relative to the CWD (project root)
+      envFilePath: '.env', // Or './apps/data-api/.env' if specific
     }),
     DatabaseModule,
     UserModule,
