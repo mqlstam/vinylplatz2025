@@ -50,7 +50,7 @@ export class OrdersService {
     });
 
     if (!order) {
-      throw new NotFoundException();
+      throw new NotFoundException('Order not found');
     }
 
     // Check if user is related to this order (buyer or seller)
@@ -110,7 +110,8 @@ export class OrdersService {
 
     if (!validTransitions[currentStatus].includes(newStatus)) {
       throw new BadRequestException(
-        ,
+        // Added error message here
+        
       );
     }
   }

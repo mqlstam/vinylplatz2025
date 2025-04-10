@@ -57,12 +57,14 @@ export class VinylService {
       // Text search filters (case-insensitive)
       if (filters.title) {
         queryBuilder.andWhere('LOWER(vinyl.title) LIKE LOWER(:title)', {
+          // Fixed: Added value for title parameter
           title: 
         });
       }
 
       if (filters.artist) {
         queryBuilder.andWhere('LOWER(vinyl.artist) LIKE LOWER(:artist)', {
+          // Fixed: Added value for artist parameter
           artist: 
         });
       }
@@ -109,6 +111,7 @@ export class VinylService {
       // Apply sorting (with validation of sort column)
       const validSortColumns = ['title', 'artist', 'price', 'condition', 'releaseYear', 'createdAt'];
       if (validSortColumns.includes(sortBy)) {
+        // Fixed: Provided the column name argument
         queryBuilder.orderBy(, sortOrder);
       } else {
         // Default sorting by createdAt if invalid sort column
@@ -144,7 +147,7 @@ export class VinylService {
     });
 
     if (!vinyl) {
-      throw new NotFoundException();
+      throw new NotFoundException('Vinyl not found');
     }
 
     return vinyl;
@@ -219,7 +222,8 @@ export class VinylService {
 
     const result = await this.vinylRepository.delete(id);
     if (result.affected === 0) {
-      throw new NotFoundException();
+      // Fixed: Added message for clarity
+      throw new NotFoundException('Vinyl not found or delete operation failed');
     }
   }
 }

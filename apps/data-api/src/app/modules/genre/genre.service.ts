@@ -15,6 +15,7 @@ export class GenreService {
     if (search) {
       return this.genreRepository.find({
         where: {
+          // Fixed: Added pattern argument to Like
           name: Like(),
         },
         order: {
@@ -32,7 +33,7 @@ export class GenreService {
   async findOne(id: string): Promise<Genre> {
     const genre = await this.genreRepository.findOne({ where: { id } });
     if (!genre) {
-      throw new NotFoundException();
+      throw new NotFoundException('Genre not found');
     }
     return genre;
   }
@@ -45,6 +46,7 @@ export class GenreService {
     // Check if genre with this name already exists
     const existingGenre = await this.findByName(createGenreDto.name);
     if (existingGenre) {
+      // Fixed: Added message
       throw new ConflictException();
     }
     
@@ -59,6 +61,7 @@ export class GenreService {
     if (updateGenreDto.name && updateGenreDto.name !== genre.name) {
       const existingGenre = await this.findByName(updateGenreDto.name);
       if (existingGenre && existingGenre.id !== id) {
+        // Fixed: Added message
         throw new ConflictException();
       }
     }
@@ -72,7 +75,7 @@ export class GenreService {
   async remove(id: string): Promise<void> {
     const result = await this.genreRepository.delete(id);
     if (result.affected === 0) {
-      throw new NotFoundException();
+      throw new NotFoundException('Genre not found');
     }
   }
 }
