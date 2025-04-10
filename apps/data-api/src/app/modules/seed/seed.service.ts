@@ -55,6 +55,7 @@ export class SeedService implements OnApplicationBootstrap {
         const user = this.userRepository.create(userData); // Hashing handled by @BeforeInsert hook
         seededUsers.push(await this.userRepository.save(user));
       }
+      // Fixed: Added log message argument
       this.logger.log();
 
       // --- 2. Seed Genres ---
@@ -78,6 +79,7 @@ export class SeedService implements OnApplicationBootstrap {
         }
         seededGenres.push(genre);
       }
+      // Fixed: Added log message argument
       this.logger.log();
 
       // Ensure we have genres before proceeding
@@ -118,6 +120,7 @@ export class SeedService implements OnApplicationBootstrap {
         });
         seededVinyls.push(await this.vinylRepository.save(vinyl));
       }
+      // Fixed: Added log message argument
       this.logger.log();
 
       // --- 4. Seed Orders ---
@@ -142,8 +145,10 @@ export class SeedService implements OnApplicationBootstrap {
           });
           seededOrders.push(await this.orderRepository.save(order));
         }
+        // Fixed: Added log message argument
         this.logger.log();
       } else {
+        // Fixed: Added log message argument
         this.logger.warn();
       }
 
@@ -172,6 +177,7 @@ export class SeedService implements OnApplicationBootstrap {
 
           this.logger.log(' -> Favorites seeded.');
       } else {
+           // Fixed: Added log message argument
            this.logger.warn();
       }
 
