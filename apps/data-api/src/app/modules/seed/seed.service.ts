@@ -56,7 +56,7 @@ export class SeedService implements OnApplicationBootstrap {
         seededUsers.push(await this.userRepository.save(user));
       }
       // Fixed: Added log message argument
-      this.logger.log();
+      this.logger.log(` -> ${seededUsers.length} Users seeded.`);
 
       // --- 2. Seed Genres ---
       this.logger.log('Seeding Genres...');
@@ -80,7 +80,7 @@ export class SeedService implements OnApplicationBootstrap {
         seededGenres.push(genre);
       }
       // Fixed: Added log message argument
-      this.logger.log();
+      this.logger.log(` -> ${seededGenres.length} Genres seeded (or found).`);
 
       // Ensure we have genres before proceeding
       const rockGenre = seededGenres.find(g => g.name === 'Rock');
@@ -121,7 +121,7 @@ export class SeedService implements OnApplicationBootstrap {
         seededVinyls.push(await this.vinylRepository.save(vinyl));
       }
       // Fixed: Added log message argument
-      this.logger.log();
+      this.logger.log(` -> ${seededVinyls.length} Vinyls seeded.`);
 
       // --- 4. Seed Orders ---
       this.logger.log('Seeding Orders...');
@@ -146,10 +146,10 @@ export class SeedService implements OnApplicationBootstrap {
           seededOrders.push(await this.orderRepository.save(order));
         }
         // Fixed: Added log message argument
-        this.logger.log();
+        this.logger.log(` -> ${seededOrders.length} Orders seeded.`);
       } else {
         // Fixed: Added log message argument
-        this.logger.warn();
+        this.logger.warn(`Skipping Order seeding due to insufficient users (${seededUsers.length}/5) or vinyls (${seededVinyls.length}/10).`);
       }
 
       // --- 5. Seed Favorites (M:N) ---
@@ -178,7 +178,7 @@ export class SeedService implements OnApplicationBootstrap {
           this.logger.log(' -> Favorites seeded.');
       } else {
            // Fixed: Added log message argument
-           this.logger.warn();
+           this.logger.warn(`Skipping Favorites seeding due to insufficient users (${seededUsers.length}/5) or vinyls (${seededVinyls.length}/10).`);
       }
 
 
