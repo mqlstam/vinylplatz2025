@@ -15,8 +15,8 @@ export class GenreService {
     if (search) {
       return this.genreRepository.find({
         where: {
-          // Fixed: Added pattern argument to Like
-          name: Like(),
+          // Corrected: Added argument to Like
+          name: Like(`%${search}%`),
         },
         order: {
           name: 'ASC',
@@ -33,7 +33,8 @@ export class GenreService {
   async findOne(id: string): Promise<Genre> {
     const genre = await this.genreRepository.findOne({ where: { id } });
     if (!genre) {
-      throw new NotFoundException('Genre not found');
+      // Corrected: Added message
+      throw new NotFoundException(`Genre with ID "${id}" not found`);
     }
     return genre;
   }
@@ -46,36 +47,37 @@ export class GenreService {
     // Check if genre with this name already exists
     const existingGenre = await this.findByName(createGenreDto.name);
     if (existingGenre) {
-      // Fixed: Added message
-      throw new ConflictException();
+      // Corrected: Added message
+      throw new ConflictException(`Genre with name "${createGenreDto.name}" already exists`);
     }
-    
+
     const genre = this.genreRepository.create(createGenreDto);
     return this.genreRepository.save(genre);
   }
 
   async update(id: string, updateGenreDto: UpdateGenreDto): Promise<Genre> {
-    const genre = await this.findOne(id);
-    
+    const genre = await this.findOne(id); // Checks if genre exists
+
     // Check if a genre with the new name already exists (if name is being updated)
     if (updateGenreDto.name && updateGenreDto.name !== genre.name) {
       const existingGenre = await this.findByName(updateGenreDto.name);
       if (existingGenre && existingGenre.id !== id) {
-        // Fixed: Added message
-        throw new ConflictException();
+        // Corrected: Added message
+        throw new ConflictException(`Genre with name "${updateGenreDto.name}" already exists`);
       }
     }
-    
+
     // Update genre properties
     Object.assign(genre, updateGenreDto);
-    
+
     return this.genreRepository.save(genre);
   }
 
   async remove(id: string): Promise<void> {
     const result = await this.genreRepository.delete(id);
     if (result.affected === 0) {
-      throw new NotFoundException('Genre not found');
+      // Corrected: Added message
+      throw new NotFoundException(`Genre with ID "${id}" not found`);
     }
   }
 }

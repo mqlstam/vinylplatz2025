@@ -56,17 +56,13 @@ export class VinylService {
     if (filters) {
       // Text search filters (case-insensitive)
       if (filters.title) {
-        queryBuilder.andWhere('LOWER(vinyl.title) LIKE LOWER(:title)', {
-          // Fixed: Added value for title parameter
-          title: 
-        });
+        // Corrected: Ensure the parameter object is correct
+        queryBuilder.andWhere('LOWER(vinyl.title) LIKE LOWER(:title)', { title: `%${filters.title}%` });
       }
 
       if (filters.artist) {
-        queryBuilder.andWhere('LOWER(vinyl.artist) LIKE LOWER(:artist)', {
-          // Fixed: Added value for artist parameter
-          artist: 
-        });
+        // Corrected: Ensure the parameter object is correct
+        queryBuilder.andWhere('LOWER(vinyl.artist) LIKE LOWER(:artist)', { artist: `%${filters.artist}%` });
       }
 
       // Exact match filters
@@ -111,14 +107,16 @@ export class VinylService {
       // Apply sorting (with validation of sort column)
       const validSortColumns = ['title', 'artist', 'price', 'condition', 'releaseYear', 'createdAt'];
       if (validSortColumns.includes(sortBy)) {
-        // Fixed: Provided the column name argument
-        queryBuilder.orderBy(, sortOrder);
+        // Corrected: orderBy takes column name and order
+        queryBuilder.orderBy(`vinyl.${sortBy}`, sortOrder);
       } else {
         // Default sorting by createdAt if invalid sort column
+        // Corrected: orderBy takes column name and order
         queryBuilder.orderBy('vinyl.createdAt', 'DESC');
       }
     } else {
       // Default sorting if no filters provided
+      // Corrected: orderBy takes column name and order
       queryBuilder.orderBy('vinyl.createdAt', 'DESC');
     }
 
@@ -147,7 +145,8 @@ export class VinylService {
     });
 
     if (!vinyl) {
-      throw new NotFoundException('Vinyl not found');
+      // Corrected: Added message to NotFoundException
+      throw new NotFoundException(`Vinyl with ID "${id}" not found`);
     }
 
     return vinyl;
@@ -162,40 +161,40 @@ export class VinylService {
 
   async create(sellerId: string, createVinylDto: CreateVinylDto): Promise<Vinyl> {
     // Get the seller
-    const seller = await this.userService.findOne(sellerId);
+    const seller = await this.userService.findOne(sellerId); // This throws NotFound if seller doesn't exist
 
     // Check if genre exists if provided
     let genre = undefined;
     if (createVinylDto.genreId) {
-      genre = await this.genreService.findOne(createVinylDto.genreId);
+      genre = await this.genreService.findOne(createVinylDto.genreId); // This throws NotFound if genre doesn't exist
     }
 
     // Create the vinyl entity
     const vinyl = this.vinylRepository.create({
       ...createVinylDto,
-      sellerId,
-      genreId: genre?.id
+      sellerId, // Use the validated sellerId
+      genreId: genre?.id // Use the validated genreId
     });
 
     // Save and return the vinyl with relations
     await this.vinylRepository.save(vinyl);
 
-    // Fetch the saved vinyl with relations
+    // Fetch the saved vinyl with relations to ensure they are loaded
     return this.findOne(vinyl.id);
   }
 
   async update(id: string, userId: string, updateVinylDto: UpdateVinylDto): Promise<Vinyl> {
-    // Get the vinyl
+    // Get the vinyl (also checks if it exists)
     const vinyl = await this.findOne(id);
 
     // Check ownership
     if (vinyl.sellerId !== userId) {
-      throw new ForbiddenException('You can only update your own vinyl listings');
+      throw new ForbiddenException('You do not have permission to update this vinyl listing');
     }
 
-    // Check if genre exists if provided
-    if (updateVinylDto.genreId) {
-      await this.genreService.findOne(updateVinylDto.genreId);
+    // Check if genre exists if provided and is different
+    if (updateVinylDto.genreId && updateVinylDto.genreId !== vinyl.genreId) {
+      await this.genreService.findOne(updateVinylDto.genreId); // This throws NotFound if genre doesn't exist
     }
 
     // Update the vinyl
@@ -209,21 +208,21 @@ export class VinylService {
   }
 
   async remove(id: string, userId: string): Promise<void> {
-    // Get the vinyl
+    // Get the vinyl (also checks if it exists)
     const vinyl = await this.findOne(id);
 
     // Check ownership
     if (vinyl.sellerId !== userId) {
-      throw new ForbiddenException('You can only delete your own vinyl listings');
+      throw new ForbiddenException('You do not have permission to delete this vinyl listing');
     }
 
-    // TODO: Check if vinyl is part of an order before deleting
-    // For now, we'll just delete it
+    // TODO: Check if vinyl is part of an ACTIVE order before deleting
+    // Add logic here if needed
 
     const result = await this.vinylRepository.delete(id);
     if (result.affected === 0) {
-      // Fixed: Added message for clarity
-      throw new NotFoundException('Vinyl not found or delete operation failed');
+      // Corrected: Added message to NotFoundException
+      throw new NotFoundException(`Vinyl with ID "${id}" not found or delete operation failed`);
     }
   }
 }
