@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Vinyl, VinylCondition, User, Genre } from '@vinylplatz/entities';
+import { Vinyl, VinylCondition, User, Genre } from '../../entities'; // Corrected import path
 
 @Injectable()
 export class VinylSeedService {
   constructor(
-    @InjectRepository(Vinyl)
+    @InjectRepository(Vinyl) // Use actual entity class
     private vinylRepository: Repository<Vinyl>,
-    @InjectRepository(User)
+    @InjectRepository(User) // Use actual entity class
     private userRepository: Repository<User>,
-    @InjectRepository(Genre)
+    @InjectRepository(Genre) // Use actual entity class
     private genreRepository: Repository<Genre>,
   ) {}
 

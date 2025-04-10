@@ -3,13 +3,13 @@
   "compilerOptions": {
     "rootDir": ".",
     "sourceMap": true,
-    "declaration": false,
-    "moduleResolution": "node", // Changed to node
-    "emitDecoratorMetadata": true, // Ensure true
-    "experimentalDecorators": true, // Ensure true
+    "declaration": true,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "importHelpers": true,
     "target": "es2015",
-    "module": "commonjs", // Changed to commonjs
+    "module": "commonjs",
     "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
@@ -18,8 +18,8 @@
       "@vinylplatz/entities": ["libs/shared/entities/src/index.ts"],
       "@vinylplatz/web-auth": ["libs/vinylplatz-web/auth/src/index.ts"]
     },
-    "esModuleInterop": true, // Often needed with commonjs
-    "allowSyntheticDefaultImports": true // Often needed with commonjs
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   },
   "exclude": ["node_modules", "tmp"]
 }

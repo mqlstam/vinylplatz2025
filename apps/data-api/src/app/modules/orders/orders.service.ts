@@ -1,14 +1,14 @@
 import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Order, OrderStatus, Vinyl } from '@vinylplatz/entities';
+import { Order, OrderStatus, Vinyl } from '../../entities'; // Corrected import path
 import { CreateOrderDto, UpdateOrderStatusDto, OrderFilterDto } from './dto/order.dto';
 import { VinylService } from '../vinyl/vinyl.service';
 
 @Injectable()
 export class OrdersService {
   constructor(
-    @InjectRepository(Order)
+    @InjectRepository(Order) // Use actual entity class
     private orderRepository: Repository<Order>,
     private vinylService: VinylService,
   ) {}
@@ -50,7 +50,7 @@ export class OrdersService {
     });
 
     if (!order) {
-      throw new NotFoundException(`Order with ID ${id} not found`);
+      throw new NotFoundException();
     }
 
     // Check if user is related to this order (buyer or seller)
@@ -110,7 +110,7 @@ export class OrdersService {
 
     if (!validTransitions[currentStatus].includes(newStatus)) {
       throw new BadRequestException(
-        `Invalid status transition from ${currentStatus} to ${newStatus}. Valid transitions are: ${validTransitions[currentStatus].join(', ')}`,
+        ,
       );
     }
   }

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsNumber, IsEnum, IsOptional, Min, Max } from 'class-validator';
-import { VinylCondition } from '@vinylplatz/entities';
+import { VinylCondition } from '../../../types/entity-types';
 
 export class CreateVinylDto {
   @ApiProperty({ example: 'Thriller', description: 'The title of the vinyl album' })

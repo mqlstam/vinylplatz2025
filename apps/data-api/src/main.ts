@@ -4,7 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app/app.module';
-import { SeedRunner } from './app/database/seed.runner'; // Assuming seed runner exists
+// Remove the SeedRunner import since it doesn't exist
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -30,29 +30,15 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
   
-  // Run seeds if SeedRunner is available and in development mode
+  // Remove the SeedRunner code since it's not implemented
+  // We can add a simple comment instead
   if (process.env.NODE_ENV !== 'production') {
-    try {
-       const seedRunner = app.get(SeedRunner, { strict: false }); // Use strict: false to avoid error if not found
-       if (seedRunner) {
-           await seedRunner.run();
-           Logger.log('Database seeding completed successfully.', 'SeedRunner');
-       } else {
-           Logger.log('SeedRunner not found, skipping seeding.', 'Bootstrap');
-       }
-    } catch (error) {
-      Logger.error('Error running seeds:', error, 'SeedRunner');
-    }
+    Logger.log('Running in development mode', 'Bootstrap');
   }
   
   const port = process.env.PORT || 3333;
   await app.listen(port);
-  Logger.log(
-    
-  );
-   Logger.log(
-    
-  );
+  Logger.log(`Application is running on: http://localhost:${port}/${globalPrefix}`, 'Bootstrap');
 }
 
 bootstrap();

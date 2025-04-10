@@ -35,7 +35,7 @@
   "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.vue"],
   "references": [
     {
-      "path": "../../libs/vinylplatz-web/tsconfig.lib.json"
+      "path": "../../libs/vinylplatz-web"
     }
   ]
 }

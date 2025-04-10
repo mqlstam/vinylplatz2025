@@ -3,7 +3,7 @@ import { OrdersService } from './orders.service';
 import { CreateOrderDto, UpdateOrderStatusDto, OrderFilterDto, OrderResponseDto } from './dto/order.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Order, OrderStatus } from '@vinylplatz/entities';
+import { Order, OrderStatus } from '../../types/entity-types';
 
 @ApiTags('orders')
 @Controller('orders')

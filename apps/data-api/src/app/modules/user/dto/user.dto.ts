@@ -1,5 +1,5 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
-import { UserRole } from '@vinylplatz/entities';
+import { UserRole } from '../../../types/entity-types';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserDto {

@@ -4,7 +4,7 @@ import { RegisterDto, LoginDto, AuthResponseDto } from './dto/auth.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { User, UserRole } from '@vinylplatz/entities';
+import { UserRole } from '../../entities';
 import { Roles } from './guards/roles.guard';
 
 @ApiTags('auth')

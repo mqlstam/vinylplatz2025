@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { User, Vinyl, Genre, Order } from '../entities';
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         username: configService.get('DB_USERNAME', 'root'),
         password: configService.get('DB_PASSWORD', ''),
         database: configService.get('DB_DATABASE', 'vinylplatz'),
-        entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+        entities: [User, Vinyl, Genre, Order],
         synchronize: configService.get('DB_SYNCHRONIZE', true),
       }),
     }),

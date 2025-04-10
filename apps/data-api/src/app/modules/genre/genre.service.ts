@@ -1,13 +1,13 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
-import { Genre } from '@vinylplatz/entities';
+import { Genre } from '../../entities'; // Corrected import path
 import { CreateGenreDto, UpdateGenreDto } from './dto/genre.dto';
 
 @Injectable()
 export class GenreService {
   constructor(
-    @InjectRepository(Genre)
+    @InjectRepository(Genre) // Use actual entity class
     private genreRepository: Repository<Genre>,
   ) {}
 
@@ -15,7 +15,7 @@ export class GenreService {
     if (search) {
       return this.genreRepository.find({
         where: {
-          name: Like(`%${search}%`),
+          name: Like(),
         },
         order: {
           name: 'ASC',
@@ -32,7 +32,7 @@ export class GenreService {
   async findOne(id: string): Promise<Genre> {
     const genre = await this.genreRepository.findOne({ where: { id } });
     if (!genre) {
-      throw new NotFoundException(`Genre with ID ${id} not found`);
+      throw new NotFoundException();
     }
     return genre;
   }
@@ -45,7 +45,7 @@ export class GenreService {
     // Check if genre with this name already exists
     const existingGenre = await this.findByName(createGenreDto.name);
     if (existingGenre) {
-      throw new ConflictException(`Genre with name '${createGenreDto.name}' already exists`);
+      throw new ConflictException();
     }
     
     const genre = this.genreRepository.create(createGenreDto);
@@ -59,7 +59,7 @@ export class GenreService {
     if (updateGenreDto.name && updateGenreDto.name !== genre.name) {
       const existingGenre = await this.findByName(updateGenreDto.name);
       if (existingGenre && existingGenre.id !== id) {
-        throw new ConflictException(`Genre with name '${updateGenreDto.name}' already exists`);
+        throw new ConflictException();
       }
     }
     
@@ -72,7 +72,7 @@ export class GenreService {
   async remove(id: string): Promise<void> {
     const result = await this.genreRepository.delete(id);
     if (result.affected === 0) {
-      throw new NotFoundException(`Genre with ID ${id} not found`);
+      throw new NotFoundException();
     }
   }
 }

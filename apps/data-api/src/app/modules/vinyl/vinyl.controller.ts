@@ -14,7 +14,7 @@ import {
 import { VinylService, VinylFilterParams, PaginatedVinyls } from './vinyl.service';
 import { CreateVinylDto, UpdateVinylDto, VinylResponseDto } from './dto/vinyl.dto';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Vinyl, VinylCondition } from '@vinylplatz/entities';
+import { Vinyl, VinylCondition } from '../../types/entity-types';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('vinyls')

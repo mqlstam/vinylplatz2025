@@ -4,12 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../../libs/shared"
-    },
-    {
-      "path": "../../libs/shared/entities"
-    },
-    {
       "path": "./tsconfig.app.json"
     },
     {

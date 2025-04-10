@@ -12,10 +12,10 @@ import {
 import { GenreService } from './genre.service';
 import { CreateGenreDto, UpdateGenreDto, GenreResponseDto } from './dto/genre.dto';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Genre } from '@vinylplatz/entities';
+import { Genre } from '../../types/entity-types';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from '../auth/guards/roles.guard';
-import { UserRole } from '@vinylplatz/entities';
+import { UserRole } from '../../types/entity-types';
 
 @ApiTags('genres')
 @Controller('genres')

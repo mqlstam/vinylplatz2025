@@ -1,9 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsUUID } from 'class-validator';
-import { Vinyl } from '@vinylplatz/entities';
+import { Vinyl } from '../../../entities'; // Use entity class if needed for types like Vinyl
 
 export class FavoriteResponseDto {
-  @ApiProperty({ type: [Vinyl], description: 'List of favorite vinyls' })
+  // Type definition might need adjustment if complex nesting is involved,
+  // but referencing the Vinyl entity class for the type hint is generally okay here.
+  @ApiProperty({ type: () => Vinyl, isArray: true, description: 'List of favorite vinyls' })
   favorites: Vinyl[];
 }
 

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsUUID } from 'class-validator';
-import { OrderStatus } from '@vinylplatz/entities';
+import { OrderStatus } from '../../../types/entity-types';
 
 export class CreateOrderDto {
   @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000', description: 'ID of the vinyl to order' })

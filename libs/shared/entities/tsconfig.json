@@ -2,20 +2,19 @@
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
     "forceConsistentCasingInFileNames": true,
-    "strict": true, // Keep strict checks locally if desired, but decorators should work now
+    "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "declaration": true,
+    "outDir": "../../../dist/out-tsc/libs/shared/entities"
   },
   "files": [],
   "include": [],
   "references": [
     {
       "path": "./tsconfig.lib.json"
-    },
-    {
-      "path": "./tsconfig.spec.json"
     }
   ]
 }

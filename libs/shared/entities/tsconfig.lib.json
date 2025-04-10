@@ -1,10 +1,11 @@
 {
-  "extends": "./tsconfig.json", // Ensure this extends the local tsconfig.json
+  "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../../dist/out-tsc",
     "declaration": true,
-    "types": ["node"]
-    // Removed strictPropertyInitialization: false - rely on base config for decorator settings
+    "types": ["node"],
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]

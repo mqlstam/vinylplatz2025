@@ -2,7 +2,7 @@ import { Controller, Get, Post, Delete, Param, UseGuards, Request, NotFoundExcep
 import { FavoritesService } from './favorites.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Vinyl } from '@vinylplatz/entities';
+import { Vinyl } from '../../types/entity-types';
 import { FavoriteResponseDto, FavoriteToggleResponseDto, FavoriteStatusDto } from './dto/favorite.dto';
 
 @ApiTags('favorites')
