@@ -9,6 +9,7 @@ import { GenreModule } from './modules/genre/genre.module';
 import { VinylModule } from './modules/vinyl/vinyl.module';
 import { FavoritesModule } from './modules/favorites/favorites.module';
 import { OrdersModule } from './modules/orders/orders.module';
+import { SeedModule } from './modules/seed/seed.module'; // Import SeedModule
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { OrdersModule } from './modules/orders/orders.module';
     GenreModule,
     VinylModule,
     FavoritesModule,
-    OrdersModule
+    OrdersModule,
+    SeedModule, // Include SeedModule here
   ],
   controllers: [AppController],
   providers: [AppService],
