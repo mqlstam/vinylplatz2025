@@ -11,15 +11,23 @@ const auth = useAuthStore();
 const recentVinyls = ref<Vinyl[]>([]);
 const loading = ref(true);
 
-// Load recent vinyls
+
 const loadRecentVinyls = async () => {
   try {
-    const vinyls = await vinylService.getAll();
-    recentVinyls.value = vinyls.slice(0, 4); // Get up to 4 recent vinyls
+    loading.value = true; // Start loading
+    const response = await vinylService.getAll({ // Fetch page 1 with default limit
+      page: 1, 
+      limit: 4, // Only fetch 4 items initially
+      sortBy: 'createdAt', 
+      sortOrder: 'DESC' 
+    }); 
+    // *** FIX HERE: Access the 'items' array from the response ***
+    recentVinyls.value = response.items; // Slice is already handled by limit
   } catch (err) {
     console.error('Error loading recent vinyls:', err);
+    // Optionally set an error state here
   } finally {
-    loading.value = false;
+    loading.value = false; // Stop loading
   }
 };
 
