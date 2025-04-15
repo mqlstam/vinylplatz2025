@@ -1,18 +1,16 @@
-# Name of the workflow displayed on GitHub Actions tab
+# .github/workflows/deploy.yml
 name: Deploy VinylPlatz to GCP (Public SQL IP)
 
-# Triggers: Run this workflow on pushes to the 'main' branch
 on:
   push:
     branches:
-      - main
+      - main # Trigger deployment on push to the main branch
 
 # Permissions required by the Google Cloud GitHub Actions
 permissions:
   contents: 'read'   # Allows checking out the repository
   id-token: 'write'  # Allows authenticating to Google Cloud via OIDC/SA Key
 
-# Environment variables available to all jobs/steps
 env:
   NODE_VERSION: '20.x' # Specify Node.js version
   # Read secrets defined in GitHub repository settings
@@ -20,11 +18,10 @@ env:
   GCP_ARTIFACT_REGISTRY_REPO: ${{ secrets.GCP_ARTIFACT_REGISTRY_REPO }}
   GCP_CLOUD_RUN_SERVICE_NAME: ${{ secrets.GCP_CLOUD_RUN_SERVICE_NAME }}
   GCP_CLOUD_RUN_REGION: ${{ secrets.GCP_CLOUD_RUN_REGION }}
-  GCP_STORAGE_BUCKET_NAME: ${{ secrets.GCP_STORAGE_BUCKET_NAME }}
+  GCP_STORAGE_BUCKET_NAME: ${{ secrets.GCP_STORAGE_BUCKET_NAME }} # Should be like gs://your-bucket
   # Consistent name for the Docker image being built/pushed
   BACKEND_IMAGE_NAME: vinylplatz-backend
 
-# Define the jobs within the workflow
 jobs:
   build_and_deploy:
     name: Build & Deploy to GCP # Name of the job
@@ -41,12 +38,13 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm' # Enable caching for npm dependencies
-        cache-dependency-path: /Users/miquelstam/vinylplatz/package-lock.json # Use absolute path for consistency
+        # Use relative path from workspace root for cache key consistency in runner
+        cache-dependency-path: ./package-lock.json
 
     - name: Install dependencies
       # Run npm ci from the workspace root. Use --force to potentially bypass peer dependency issues.
       run: npm ci --force
-      working-directory: /Users/miquelstam/vinylplatz
+      working-directory: ./ # Relative path from checkout root
 
     - name: Authenticate to Google Cloud
       id: auth # Give this step an ID to reference later if needed
@@ -59,9 +57,16 @@ jobs:
       uses: 'google-github-actions/setup-gcloud@v2' # Installs and configures the gcloud CLI
 
     # --- Backend Build & Deploy (Cloud Run) ---
+    - name: Extract Artifact Registry Hostname
+      id: get_registry_host # Give this step an ID
+      # Use shell command to extract the part before the first '/'
+      run: echo "hostname=$(echo $GCP_ARTIFACT_REGISTRY_REPO | cut -d'/' -f1)" >> $GITHUB_OUTPUT
+      env:
+        GCP_ARTIFACT_REGISTRY_REPO: ${{ env.GCP_ARTIFACT_REGISTRY_REPO }}
+
     - name: Configure Docker for Artifact Registry
-      # Authenticates Docker CLI with Artifact Registry using gcloud credentials
-      run: gcloud auth configure-docker ${{ env.GCP_ARTIFACT_REGISTRY_REPO.split('/')[0] }} --quiet
+      # Authenticates Docker CLI with the extracted hostname
+      run: gcloud auth configure-docker ${{ steps.get_registry_host.outputs.hostname }} --quiet
 
     - name: Set up Docker Buildx
       # Initializes Docker Buildx for enhanced build capabilities (like caching)
@@ -71,8 +76,8 @@ jobs:
       id: docker_build # Give this step an ID to reference its outputs
       uses: docker/build-push-action@v5 # Action to build and push Docker images
       with:
-        context: /Users/miquelstam/vinylplatz # Root of the workspace is the build context
-        file: /Users/miquelstam/vinylplatz/apps/data-api/Dockerfile # Absolute path to the Dockerfile
+        context: ./ # Build context is the workspace root
+        file: ./apps/data-api/Dockerfile # Relative path to the Dockerfile
         push: true # Push the built image to the registry
         # Tag the image with the full registry path and the unique commit SHA
         tags: ${{ env.GCP_ARTIFACT_REGISTRY_REPO }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}
@@ -98,23 +103,29 @@ jobs:
     - name: Build Vue frontend
       # Run the Nx build command for the frontend app in production mode
       run: npx nx build vinylplatz-web --configuration=production
-      working-directory: /Users/miquelstam/vinylplatz # Ensure command runs from workspace root
+      working-directory: ./ # Ensure command runs from workspace root
       env:
         # Critical: Set the VITE_API_URL environment variable during the build
         # This injects the *actual deployed backend URL* into the frontend code
         # Assumes your NestJS global prefix is /api. Adjust if different.
         VITE_API_URL: ${{ steps.deploy_backend.outputs.url }}/api
 
+    - name: Extract GCS Bucket Name (without gs://)
+      id: get_bucket_name # Give this step an ID
+      # Use shell command to remove the 'gs://' prefix
+      run: echo "name=$(echo $GCP_STORAGE_BUCKET_NAME | sed 's#gs://##')" >> $GITHUB_OUTPUT
+      env:
+        GCP_STORAGE_BUCKET_NAME: ${{ env.GCP_STORAGE_BUCKET_NAME }}
+
     - name: Deploy Frontend to Google Cloud Storage
       uses: 'google-github-actions/upload-cloud-storage@v2' # Action to upload files to GCS
       with:
         # Path to the built frontend artifacts within the runner's workspace
-        path: /Users/miquelstam/vinylplatz/dist/apps/vinylplatz-web
-        # Target GCS bucket (remove the 'gs://' prefix for the destination)
-        destination: ${{ env.GCP_STORAGE_BUCKET_NAME.replace('gs://', '') }}
+        path: ./dist/apps/vinylplatz-web
+        # Target GCS bucket name (extracted in the previous step)
+        destination: ${{ steps.get_bucket_name.outputs.name }}
         # Upload contents directly into the bucket, not within a parent folder
         parent: false
         # Optional: Set cache headers for uploaded files
         headers: |
           cache-control: public, max-age=3600
-
