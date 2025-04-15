@@ -8,7 +8,6 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY tsconfig.base.json ./
 COPY nx.json ./
-# --- FIX: Copy root eslint config ---
 COPY eslint.config.mjs ./
 
 # Install dependencies based on root package files
@@ -19,8 +18,11 @@ COPY apps/data-api ./apps/data-api
 COPY libs/shared/entities ./libs/shared/entities
 
 # Build the data-api application using Nx
-# Nx needs the source code and config files (project.json, tsconfig, eslint) in place
 RUN npx nx build data-api --configuration=production
+
+# --- Add this debugging step ---
+RUN echo "--- Listing contents of /app/dist after build ---" && ls -lR /app/dist || echo "--- /app/dist not found or empty ---"
+# --- End of debugging step ---
 
 # --- Production Stage ---
 FROM node:20-alpine
@@ -30,6 +32,7 @@ WORKDIR /app
 COPY --from=builder /app/node_modules ./node_modules
 
 # Copy the built application files from the builder stage's dist directory
+# This is the step that was failing
 COPY --from=builder /app/dist/apps/data-api .
 
 # Copy package.json (required by some frameworks/libraries at runtime)
