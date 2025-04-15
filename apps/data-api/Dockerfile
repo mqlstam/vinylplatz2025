@@ -20,8 +20,8 @@ COPY libs/shared/entities ./libs/shared/entities
 # Build the data-api application using Nx
 RUN npx nx build data-api --configuration=production
 
-# --- Add this debugging step ---
-RUN echo "--- Listing contents of /app/dist after build ---" && ls -lR /app/dist || echo "--- /app/dist not found or empty ---"
+# --- Add this debugging step (modified) ---
+RUN echo "--- Listing contents of /app after build ---" && ls -lR /app || echo "--- /app not found or empty ---"
 # --- End of debugging step ---
 
 # --- Production Stage ---
