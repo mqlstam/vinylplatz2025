@@ -56,6 +56,13 @@ jobs:
     - name: Set up Cloud SDK (gcloud)
       uses: 'google-github-actions/setup-gcloud@v2' # Installs and configures the gcloud CLI
 
+    # --- Debugging Step ---
+    - name: List files in build context
+      run: |
+        echo "Listing files from repository root:"
+        ls -laR ./
+      working-directory: ./ # Run from the checkout root
+
     # --- Backend Build & Deploy (Cloud Run) ---
     - name: Extract Artifact Registry Hostname
       id: get_registry_host # Give this step an ID
