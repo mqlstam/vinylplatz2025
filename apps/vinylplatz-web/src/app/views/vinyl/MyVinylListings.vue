@@ -13,13 +13,16 @@ const loading = ref(true);
 const error = ref<string | null>(null);
 
 // Load data
+// Inside apps/vinylplatz-web/src/app/views/vinyl/MyVinylListings.vue
+
 const loadMyVinyls = async () => {
   loading.value = true;
   error.value = null;
   
   try {
-    vinyls.value = await vinylService.getMyListings();
-  } catch (err) {
+    // FIX: Change getMyListings to getMyVinyls
+    vinyls.value = await vinylService.getMyVinyls(); 
+  } catch (err: any) { // Add type annotation for better error handling
     console.error('Error loading my vinyl listings:', err);
     error.value = 'Failed to load your vinyl listings. Please try again later.';
   } finally {

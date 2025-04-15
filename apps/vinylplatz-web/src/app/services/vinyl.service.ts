@@ -124,9 +124,10 @@ export const vinylService = {
   /**
    * Get vinyls listed by the current user
    */
-  async getMyVinyls(): Promise<Vinyl[]> {
+  async getMyVinyls(): Promise<Vinyl[]> { // <--- THIS is likely the correct name
     const response = await apiClient.get('/vinyls/seller/me');
-    return response.data.results || response.data;
+    // Make sure it returns the data correctly, might need .data or .data.results
+    return response.data.results || response.data; 
   },
 
   /**
