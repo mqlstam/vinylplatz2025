@@ -8,19 +8,18 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY tsconfig.base.json ./
 COPY nx.json ./
+# --- FIX: Copy root eslint config ---
+COPY eslint.config.mjs ./
 
 # Install dependencies based on root package files
-# Using --force, consider resolving conflicts properly.
 RUN npm ci --force
 
-# --- IMPORTANT CHANGE: Copy necessary source directories AFTER npm ci ---
-# Copy the specific app source
+# Copy necessary source directories AFTER npm ci
 COPY apps/data-api ./apps/data-api
-# Copy the specific shared library source
 COPY libs/shared/entities ./libs/shared/entities
 
 # Build the data-api application using Nx
-# Nx needs the source code and config files (project.json, tsconfig) in place
+# Nx needs the source code and config files (project.json, tsconfig, eslint) in place
 RUN npx nx build data-api --configuration=production
 
 # --- Production Stage ---
