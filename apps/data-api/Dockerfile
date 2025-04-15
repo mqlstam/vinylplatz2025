@@ -20,9 +20,8 @@ COPY libs/shared/entities ./libs/shared/entities
 # Build the data-api application using Nx
 RUN npx nx build data-api --configuration=production
 
-# --- Add this debugging step (modified) ---
-RUN echo "--- Listing contents of /app after build ---" && ls -lR /app || echo "--- /app not found or empty ---"
-# --- End of debugging step ---
+# --- Remove or comment out the debug step now ---
+# RUN echo "--- Listing contents of /app after build ---" && ls -lR /app || echo "--- /app not found or empty ---"
 
 # --- Production Stage ---
 FROM node:20-alpine
@@ -31,9 +30,9 @@ WORKDIR /app
 # Copy production node_modules from the builder stage
 COPY --from=builder /app/node_modules ./node_modules
 
-# Copy the built application files from the builder stage's dist directory
-# This is the step that was failing
-COPY --from=builder /app/dist/apps/data-api .
+# --- FIX: Correct the source path for built artifacts ---
+# Copy the built application files from the builder stage's ACTUAL dist directory
+COPY --from=builder /app/apps/data-api/dist . 
 
 # Copy package.json (required by some frameworks/libraries at runtime)
 COPY package.json .
