@@ -10,10 +10,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read # This is required for actions/checkout
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
+
+      # --- ADD THIS STEP ---
+      - name: Reset Nx Cache
+        run: npx nx reset
 
       - name: Set up Node.js version
         uses: actions/setup-node@v3
@@ -21,11 +25,10 @@ jobs:
           node-version: '20.x'
 
       - name: Install Root Dependencies
-        run: npm install # Installs all monorepo dependencies including build tools
+        run: npm install
 
-      # --- Build the specific application ---
       - name: Build data-api application
-        run: npx nx build data-api --configuration=production # Use Nx to build the specific app
+        run: npx nx build data-api --configuration=production
 
       # --- Debugging: Add this step to see the directory structure ---
       # Helps confirm the build output path if errors persist
