@@ -39,18 +39,20 @@ jobs:
         run: npx nx build vinylplatz-web --configuration=production # Use Nx to build the specific frontend app
       # --- End of Added Build Steps ---
 
-      - name: Deploy to Azure Static Web Apps # Changed step name for clarity
-        id: builddeploy # Keep the original ID
+      - name: Deploy to Azure Static Web Apps
+        id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_HAPPY_ROCK_0FD759B03 }} # Use the secret Azure created
-          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_HAPPY_ROCK_0FD759B03 }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          ###### Corrected Repository/Build Configurations ######
+          ###### Repository/Build Configurations ######
           app_location: "dist/apps/vinylplatz-web" # Correct: Path to the BUILT app output
-          api_location: "" # Correct: API is hosted elsewhere
-          output_location: "" # Correct: Not needed when action="upload" and app_location is the final output dir
-          ###### End of Corrected Repository/Build Configurations ######
+          api_location: ""
+          output_location: ""
+          ###### End of Repository/Build Configurations ######
+          skip_app_build: true # <--- ADD THIS LINE
+          # skip_api_build: true # Can also add this for clarity, though api_location is blank
 
   # Keep the close_pull_request_job as Azure generated it
   close_pull_request_job:
