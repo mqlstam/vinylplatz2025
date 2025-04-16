@@ -1,4 +1,3 @@
-// /Users/miquelstam/vinylplatz/apps/data-api/src/app/database/database.module.ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -8,17 +7,17 @@ import { URL } from 'node:url'; // Import URL for parsing
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule], // Ensure ConfigModule is imported globally or here
+      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const databaseUrl = configService.get<string>('DATABASE_URL');
 
         if (!databaseUrl) {
-          // In production (Cloud Run), DATABASE_URL MUST be set via secrets.
+          // In production, DATABASE_URL MUST be set
           if (process.env.NODE_ENV === 'production') {
              throw new Error('DATABASE_URL environment variable is required for production');
           } else {
-            // Fallback for local development using individual .env vars if DATABASE_URL is missing
+            // Fallback for local development
             console.warn('DATABASE_URL not set, attempting fallback to DB_* vars for local dev.');
             return {
                 type: 'mysql',
@@ -34,21 +33,26 @@ import { URL } from 'node:url'; // Import URL for parsing
           }
         }
 
-        // --- Parse the DATABASE_URL ---
+        // Parse the DATABASE_URL
         const url = new URL(databaseUrl);
-        const socketPath = url.searchParams.get('socketPath'); // Extract socketPath query param
+        const socketPath = url.searchParams.get('socketPath');
+        const sslMode = url.searchParams.get('sslmode') || 'require'; // Default to require SSL
 
         // Base TypeORM options
-        const typeOrmOptions: any = { // Use 'any' or a more specific TypeORM options type
+        const typeOrmOptions: any = {
           type: 'mysql',
-          username: url.username || configService.get<string>('DB_USERNAME'), // Fallback if not in URL
-          password: url.password || configService.get<string>('DB_PASSWORD'), // Fallback if not in URL
-          database: url.pathname.slice(1) || configService.get<string>('DB_DATABASE'), // Remove leading '/' or fallback
+          username: url.username || configService.get<string>('DB_USERNAME'),
+          password: url.password || configService.get<string>('DB_PASSWORD'),
+          database: url.pathname.slice(1) || configService.get<string>('DB_DATABASE'),
           entities: [User, Vinyl, Genre, Order],
-          synchronize: configService.get<string>('DB_SYNCHRONIZE', 'false').toLowerCase() === 'true', // Default false in prod
-          logging: process.env.NODE_ENV !== 'production', // Log SQL only in dev
-          // Add other common options if needed
-          // e.g., migrations: [...]
+          synchronize: configService.get<string>('DB_SYNCHRONIZE', 'false').toLowerCase() === 'true',
+          logging: process.env.NODE_ENV !== 'production',
+          // Azure MySQL requires SSL
+          ssl: true,
+          extra: {
+            // Helps with Azure MySQL connections
+            trustServerCertificate: true,
+          },
         };
 
         if (socketPath) {
@@ -56,7 +60,7 @@ import { URL } from 'node:url'; // Import URL for parsing
           console.log(`Connecting via Cloud SQL Proxy socket: ${socketPath}`);
           typeOrmOptions.socketPath = socketPath;
         } else {
-          // Otherwise, use host/port (e.g., for local dev without proxy or direct Public IP)
+          // Otherwise, use host/port
           console.log(`Connecting via TCP to host: ${url.hostname}`);
           typeOrmOptions.host = url.hostname;
           typeOrmOptions.port = parseInt(url.port, 10) || 3306;
